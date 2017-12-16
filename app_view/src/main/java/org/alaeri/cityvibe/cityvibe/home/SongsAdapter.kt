@@ -9,16 +9,12 @@ import android.view.ViewGroup
 import com.bumptech.glide.Glide
 import kotlinx.android.synthetic.main.song_list_item.view.*
 import org.alaeri.cityvibe.cityvibe.R
+import org.alaeri.cityvibe.model.Song
 
 /**
  * Created by Emmanuel Requier on 16/12/2017.
  * This class displays data in the song list view
  */
-data class Stub(val title: String, val artist: String, val coverUrl: String)
-val stubs = listOf(
-        Stub("HELLO WORLD", "Emmanuel", "https://www.fuse.tv/image/5a0489463a74bbf97d00001a/768/512/geazy-the-beatuful-and-damned-album-cover.jpg"),
-        Stub("PLEASE WORK","CHURCHES",  "https://www.fuse.tv/image/5a3152b4acecb14a10000018/768/512/miguel-war-leisure-album-cover-full-size.jpg"),
-        Stub("PLS CALL ME MAYBE","MAYBE","https://www.fuse.tv/image/5a3152b4acecb14a10000036/768/512/tyler-the-creator-flower-boy-album-cover-full-size.jpg"))
 
 class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -32,15 +28,15 @@ class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
  * Simple songs adapter
  *
  */
-class SongsAdapter : RecyclerView.Adapter<VH>() {
+class SongsAdapter(private val songs: List<Song>) : RecyclerView.Adapter<VH>() {
 
     private var layoutInflater : LayoutInflater? = null
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        val stub = stubs[position]
-        holder.artistTextView.text = stub.artist
-        holder.titleTextView.text = stub.title
-        Glide.with(holder.coverThumbImageView).load(stub.coverUrl).into(holder.coverThumbImageView)
+        val song = songs[position]
+        holder.artistTextView.text = song.artist
+        holder.titleTextView.text = song.title
+        Glide.with(holder.coverThumbImageView).load(song.coverUrl).into(holder.coverThumbImageView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
@@ -54,7 +50,7 @@ class SongsAdapter : RecyclerView.Adapter<VH>() {
     }
 
     override fun getItemCount(): Int {
-        return stubs.size
+        return songs.size
     }
 
 }

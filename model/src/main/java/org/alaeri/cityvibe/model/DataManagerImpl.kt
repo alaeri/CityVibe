@@ -31,7 +31,7 @@ class DataManagerImpl: DataManager {
     }
 
     override fun refreshPopular(): Single<RefreshResults> =
-        itunesAPI.search("Kanye")
+        itunesAPI.search("Animal Collective")
                 .map {
                     Log.d("DataManagerImpl","$it")
                     it.results.map {
