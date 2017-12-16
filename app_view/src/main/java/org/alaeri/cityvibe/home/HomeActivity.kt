@@ -1,13 +1,14 @@
-package org.alaeri.cityvibe.cityvibe.home
+package org.alaeri.cityvibe.home
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.SearchView
 import android.widget.Toast
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_home.*
+import org.alaeri.cityvibe.R
 import org.alaeri.cityvibe.cityvibe.CityVibeApp
-import org.alaeri.cityvibe.cityvibe.R
 import org.alaeri.cityvibe.model.DataManager
 import org.alaeri.cityvibe.model.RefreshResults
 import org.alaeri.cityvibe.model.Song
@@ -30,6 +31,17 @@ class HomeActivity : AppCompatActivity() {
         dataManager = (this.application as CityVibeApp).dataManager
 
         setContentView(R.layout.activity_home)
+
+        searchView.setIconifiedByDefault(false) // Do not iconify the widget; expand it by default
+        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+
+            override fun onQueryTextSubmit(query: String): Boolean = query(query)
+
+            override fun onQueryTextChange(newText: String): Boolean = query(newText)
+
+        })
+
+
         songListView.layoutManager = LinearLayoutManager(this)
         songListView.adapter = songsAdapter
 
@@ -38,10 +50,20 @@ class HomeActivity : AppCompatActivity() {
 
     }
 
+    private fun query(newText: String): Boolean {
+        if (newText.isEmpty()) {
+            replaceContentWith(dataManager.popularSongs)
+        } else {
+            val sub = dataManager.search(newText).subscribe { it ->
+                replaceContentWith(it)
+            }
+            compositeDisposable.add(sub)
+        }
+        return true
+    }
+
     private fun initTopCharts() {
-        displayedSongs.clear()
-        displayedSongs.addAll(dataManager.popularSongs)
-        songsAdapter.notifyDataSetChanged()
+        replaceContentWith(dataManager.popularSongs)
         refresh()
     }
 
@@ -50,9 +72,8 @@ class HomeActivity : AppCompatActivity() {
         val sub = dataManager.refreshPopular().subscribe { it ->
             when (it) {
                 is RefreshResults.NewResults -> {
-                    displayedSongs.clear()
-                    displayedSongs.addAll(it.songs)
-                    songsAdapter.notifyDataSetChanged()
+                    val songs = it.songs
+                    replaceContentWith(songs)
                 }
                 is RefreshResults.NoChange -> Toast.makeText(this, R.string.no_changes, Toast.LENGTH_SHORT).show()
                 is RefreshResults.NoConnection -> Toast.makeText(this, R.string.no_network, Toast.LENGTH_SHORT).show()
@@ -60,6 +81,12 @@ class HomeActivity : AppCompatActivity() {
             swiperefresh.isRefreshing = false
         }
         compositeDisposable.add(sub)
+    }
+
+    private fun replaceContentWith(songs: List<Song>) {
+        displayedSongs.clear()
+        displayedSongs.addAll(songs)
+        songsAdapter.notifyDataSetChanged()
     }
 
     override fun onDestroy() {

@@ -9,7 +9,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
-import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Created by Emmanuel Requier on 16/12/2017.
@@ -77,6 +77,10 @@ class DataManagerImpl: DataManager {
                             Song(it.trackName, it.artistName, it.artworkUrl100)
                         } // We map to a format we can use
                     }
+                    .doOnError {
+                        Log.e("DataManagerImpl", "error searching $it", it.cause)
+                    }
+                    .onErrorReturn { ArrayList() }
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
 
