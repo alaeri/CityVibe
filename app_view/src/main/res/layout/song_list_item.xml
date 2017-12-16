@@ -6,7 +6,7 @@
     android:padding="@dimen/margin"
     android:layout_height="wrap_content">
 
-    <ImageView
+    <android.support.v7.widget.AppCompatImageView
         android:id="@+id/coverThumbImageView"
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -15,7 +15,7 @@
         app:layout_constraintTop_toTopOf="parent"
         tools:src="@mipmap/ic_launcher_round"/>
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/titleTextView"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -23,6 +23,7 @@
         android:maxLines="1"
         android:ellipsize="end"
         android:textStyle="bold"
+        android:gravity="start|bottom"
         app:layout_constraintBottom_toTopOf="@id/artistTextView"
         app:layout_constraintStart_toEndOf="@id/coverThumbImageView"
         app:layout_constraintTop_toTopOf="parent"
@@ -30,13 +31,14 @@
         android:layout_marginStart="@dimen/margin"
         android:layout_marginLeft="@dimen/margin" />
 
-    <TextView
+    <android.support.v7.widget.AppCompatTextView
         android:id="@+id/artistTextView"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:singleLine="true"
         android:maxLines="1"
         android:ellipsize="end"
+        android:gravity="start|top"
         app:layout_constraintStart_toEndOf="@id/coverThumbImageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
