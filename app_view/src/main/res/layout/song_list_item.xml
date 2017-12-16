@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:padding="@dimen/margin"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/coverThumbImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@mipmap/ic_launcher_round"/>
+
+    <TextView
+        android:id="@+id/titleTextView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/artistTextView"
+        app:layout_constraintStart_toEndOf="@id/coverThumbImageView"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginLeft="@dimen/margin" />
+
+    <TextView
+        android:id="@+id/artistTextView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="end"
+        app:layout_constraintStart_toEndOf="@id/coverThumbImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/titleTextView"
+        android:layout_marginStart="@dimen/margin"
+        android:layout_marginLeft="@dimen/margin"/>
+
+</android.support.constraint.ConstraintLayout>
