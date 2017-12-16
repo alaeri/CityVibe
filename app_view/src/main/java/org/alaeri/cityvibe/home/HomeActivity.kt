@@ -1,6 +1,7 @@
 package org.alaeri.cityvibe.home
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -15,12 +16,14 @@ import org.alaeri.cityvibe.model.RefreshResults
 import org.alaeri.cityvibe.model.Song
 import org.alaeri.cityvibe.player.PlayerActivity
 import java.util.*
-
+import android.support.v4.view.ViewCompat
+import android.support.v4.app.ActivityOptionsCompat
 
 class HomeActivity : AppCompatActivity() {
 
     companion object {
-        const val KEY_EXTRA_SONG = "SONG"
+        const val KEY_EXTRA_SELECTED_SONG_POSITION = "SELECTED_SONG_POSITION"
+        const val KEY_EXTRA_SONGS = "SONGS"
 
     }
 
@@ -30,10 +33,15 @@ class HomeActivity : AppCompatActivity() {
 
     private val displayedSongs = ArrayList<Song>()
 
-    private val songsAdapter = SongsAdapter(displayedSongs) {
+    private val songsAdapter = SongsAdapter(displayedSongs) { position, sharedImageView ->
         val intent = Intent(this, PlayerActivity::class.java)
-        intent.putExtra(KEY_EXTRA_SONG, it)
-        startActivity(intent)
+        intent.putExtra(KEY_EXTRA_SELECTED_SONG_POSITION, position)
+        intent.putExtra(KEY_EXTRA_SONGS, displayedSongs)
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                this,
+                sharedImageView,
+                ViewCompat.getTransitionName(sharedImageView))
+       startActivity(intent, options.toBundle())
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

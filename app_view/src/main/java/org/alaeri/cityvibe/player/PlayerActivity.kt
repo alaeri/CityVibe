@@ -3,6 +3,7 @@ package org.alaeri.cityvibe.player
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
+import android.support.v4.view.ViewCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.bumptech.glide.Glide
@@ -18,17 +19,21 @@ import org.alaeri.cityvibe.model.Song
  */
 class PlayerActivity: AppCompatActivity() {
 
-    val compositeDispo = CompositeDisposable()
-    val mp = MediaPlayer()
+    private val compositeDispo = CompositeDisposable()
+    private val mp = MediaPlayer()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
+        supportPostponeEnterTransition()
 
-        val song = intent.extras[HomeActivity.KEY_EXTRA_SONG] as Song
+        val songPosition = intent.extras[HomeActivity.KEY_EXTRA_SELECTED_SONG_POSITION] as Int
+        val songs = intent.extras[HomeActivity.KEY_EXTRA_SONGS] as ArrayList<*>
+        val song = songs[songPosition] as Song
 
         Glide.with(this).load(song.coverUrl).into(coverLargeImageView)
+        ViewCompat.setTransitionName(coverLargeImageView, song.coverUrl)
         titleTextView.text = song.title
         artistTextView.text = song.artist
 
@@ -46,6 +51,8 @@ class PlayerActivity: AppCompatActivity() {
 
         mp.setOnCompletionListener { finish() }
         compositeDispo.add(sub)
+
+        supportStartPostponedEnterTransition()
     }
 
     override fun onPause() {
