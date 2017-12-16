@@ -26,10 +26,11 @@ A few rules:
 * [x] Display a stubbed list
 * [x] Fetch data with a basic data manager and retrofit
 * [x] List of top 100 songs.
-* [x] Find how to best implement a good org.alaeri.cityvibe.search system : https://developer.android.com/guide/topics/org.alaeri.cityvibe.search/org.alaeri.cityvibe.search-dialog.html
+* [x] Find how to best implement a good search system : https://developer.android.com/guide/topics/search [was really poor]
 * [x] Search view and results
-* [ ] Map a song to a playable song by querying for previewUrl
-* [ ] Basic player
+* [x] Map a song to a playable song by querying for previewUrl
+* [x] Basic player
+* [ ] MediaService
 * [ ] Currently playing notification
 
 ## BACKLOG
