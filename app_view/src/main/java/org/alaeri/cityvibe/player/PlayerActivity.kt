@@ -1,5 +1,6 @@
 package org.alaeri.cityvibe.player
 
+import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
@@ -7,6 +8,10 @@ import android.support.v4.view.ViewCompat
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.DataSource
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestListener
+import com.bumptech.glide.request.target.Target
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_player.*
 import org.alaeri.cityvibe.R
@@ -32,7 +37,17 @@ class PlayerActivity: AppCompatActivity() {
         val songs = intent.extras[HomeActivity.KEY_EXTRA_SONGS] as ArrayList<*>
         val song = songs[songPosition] as Song
 
-        Glide.with(this).load(song.coverUrl).into(coverLargeImageView)
+        Glide.with(this).load(song.coverUrl).listener(object: RequestListener<Drawable>{
+            override fun onResourceReady(resource: Drawable, model: Any, target: Target<Drawable>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
+                supportStartPostponedEnterTransition()
+                return false
+            }
+
+            override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>?, isFirstResource: Boolean): Boolean {
+                supportStartPostponedEnterTransition()
+                return false
+            }
+        }).into(coverLargeImageView)
         ViewCompat.setTransitionName(coverLargeImageView, song.coverUrl)
         titleTextView.text = song.title
         artistTextView.text = song.artist
@@ -49,10 +64,9 @@ class PlayerActivity: AppCompatActivity() {
 
         }
 
+        quitButton.setOnClickListener{ finish() } //Add transition to bottom
         mp.setOnCompletionListener { finish() }
         compositeDispo.add(sub)
-
-        supportStartPostponedEnterTransition()
     }
 
     override fun onPause() {
