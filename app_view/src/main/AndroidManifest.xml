@@ -11,7 +11,8 @@
         android:supportsRtl="true"
         android:name=".cityvibe.CityVibeApp"
         android:theme="@style/AppTheme">
-        <activity android:name="org.alaeri.cityvibe.home.HomeActivity">
+        <activity android:name="org.alaeri.cityvibe.home.HomeActivity"
+            android:windowSoftInputMode="stateAlwaysHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

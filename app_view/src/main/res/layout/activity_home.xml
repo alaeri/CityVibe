@@ -17,15 +17,16 @@
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="70dp"
                 android:background="?attr/colorPrimary"
                 android:elevation="4dp"
+                android:padding="@dimen/margin"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
                 <android.support.v7.widget.SearchView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:foregroundTint="#FFFFFF"
+                    android:background="@drawable/searchview_bg"
                     android:id="@+id/searchView"/>
             </android.support.v7.widget.Toolbar>
 
@@ -50,7 +51,11 @@
             android:id="@+id/songListView"
             android:scrollbars="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/margin"
+            android:paddingRight="@dimen/margin"
+            android:paddingLeft="@dimen/margin"
+            android:clipToPadding="false" />
     </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.design.widget.CoordinatorLayout>
 
