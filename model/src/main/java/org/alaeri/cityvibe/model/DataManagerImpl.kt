@@ -9,6 +9,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import java.util.*
 
 /**
  * Created by Emmanuel Requier on 16/12/2017.
@@ -20,7 +21,7 @@ class DataManagerImpl: DataManager {
     private val itunesAPI: ItunesAPI
     private val chartsAPI: ChartAPI
 
-    private val popularSongs = ArrayList<Song>()
+    override val popularSongs = ArrayList<Song>()
 
     init {
         val retrofitItunes = Retrofit.Builder()
@@ -36,6 +37,7 @@ class DataManagerImpl: DataManager {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
         chartsAPI = retrofitCharts.create(ChartAPI::class.java)
+
     }
 
     override fun refreshPopular(): Single<RefreshResults> =
@@ -47,11 +49,10 @@ class DataManagerImpl: DataManager {
                     } // We map to a format we can use
                 }
                 .map {
-                    when(it) {
-                        popularSongs -> RefreshResults.NoChange(it)
+                    when {
+                        it.isSame(popularSongs) -> RefreshResults.NoChange(it)
                         else -> RefreshResults.NewResults(it)
                     }
-
                 }
                 .doOnSuccess { it -> popularSongs.clear(); popularSongs.addAll(it.songs) }
                 .onErrorReturn {
@@ -61,6 +62,13 @@ class DataManagerImpl: DataManager {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
+    private fun <T> List<T>.isSame(o: List<T>): Boolean  {
+        val temp = ArrayList(this)
+        temp.retainAll(o)
+        Log.d("DataManagerImpl","size: ${temp.size} / ${this.size}")
+        return temp.size == this.size
+    }
+
     override fun search(term: String) =
             itunesAPI.search(term)
                     .map {
@@ -68,18 +76,6 @@ class DataManagerImpl: DataManager {
                         it.results.map {
                             Song(it.trackName, it.artistName, it.artworkUrl100)
                         } // We map to a format we can use
-                    }
-                    .map {
-                        when(it) {
-                            popularSongs -> RefreshResults.NoChange(it)
-                            else -> RefreshResults.NewResults(it)
-                        }
-
-                    }
-                    .doOnSuccess { it -> popularSongs.clear(); popularSongs.addAll(it.songs) }
-                    .onErrorReturn {
-                        Log.e("DataManagerImpl","Exception: $it")
-                        return@onErrorReturn  RefreshResults.NoConnection(songs = popularSongs)
                     }
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
@@ -97,7 +93,6 @@ interface ItunesAPI {
     @GET("search?media=music&entity=song")
     fun search(@Query("term") term: String):
             Single<ItunesSongSearchResult>
-
 
 }
 

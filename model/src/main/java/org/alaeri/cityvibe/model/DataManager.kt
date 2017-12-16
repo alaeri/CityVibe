@@ -25,5 +25,7 @@ interface DataManager {
 
     fun refreshPopular() : Single<RefreshResults>
 
-    fun search(term: String): Single<RefreshResults>?
+    fun search(term: String): Single<List<Song>>
+
+    val popularSongs: List<Song>
 }
