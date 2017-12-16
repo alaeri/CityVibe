@@ -21,7 +21,10 @@ A few rules:
 
 ## TODO
 
+* [x] Display a stubbed list
+* [ ] Fetch data with a basic data manager and retrofit
 * [ ] List of top 100 songs.
+* [ ] Find how to best implement a good search system
 * [ ] Search view and results
 * [ ] Player
 
@@ -30,6 +33,7 @@ A few rules:
 FlavorDimension for sound provider ? Maybe first spotify as I have a premium account
 FlavorDimension for technicalTest and Cityvibe with geotagged sounds ?
 RunningMusic notification
+Make a server to have a real API?
 
 
 
