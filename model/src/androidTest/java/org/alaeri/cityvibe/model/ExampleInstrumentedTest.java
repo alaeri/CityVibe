@@ -3,9 +3,14 @@ package org.alaeri.cityvibe.model;
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
+import android.util.Log;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.subscribers.TestSubscriber;
 
 import static org.junit.Assert.*;
 
@@ -22,5 +27,17 @@ public class ExampleInstrumentedTest {
         Context appContext = InstrumentationRegistry.getTargetContext();
 
         assertEquals("org.alaeri.cityvibe.model.test", appContext.getPackageName());
+    }
+
+
+    @Test
+    public void testRefreshPopular(){
+        DataManager dataManager = new DataManagerImpl();
+        RefreshResults refreshResults = dataManager.refreshPopular().test().awaitDone(3, TimeUnit.SECONDS).values().get(0);
+        Log.d("DataManagerImpl","refreshResults: "+refreshResults.getSongs().size() + refreshResults);
+        RefreshResults refreshResults2 = dataManager.refreshPopular().test().awaitDone(3, TimeUnit.SECONDS).values().get(0);
+        Log.d("DataManagerImpl","refreshResults2: "+refreshResults2.getSongs().size() + refreshResults);
+
+
     }
 }
