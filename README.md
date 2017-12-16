@@ -19,20 +19,25 @@ A few rules:
 * You can use any library you want
 * You can upload the code on github
 
+##
+
 ## TODO
 
 * [x] Display a stubbed list
-* [ ] Fetch data with a basic data manager and retrofit
-* [ ] List of top 100 songs.
-* [ ] Find how to best implement a good search system
+* [x] Fetch data with a basic data manager and retrofit
+* [x] List of top 100 songs.
+* [x] Find how to best implement a good search system : https://developer.android.com/guide/topics/search/search-dialog.html
 * [ ] Search view and results
-* [ ] Player
+* [ ] Map a song to a playable song by querying for previewUrl
+* [ ] Basic player
+* [ ] Currently playing notification
 
 ## BACKLOG
 
+Make a real DI rather than having a dataManager singleton in CityVibeApp ?
+Add a persistence layer ?
 FlavorDimension for sound provider ? Maybe first spotify as I have a premium account
 FlavorDimension for technicalTest and Cityvibe with geotagged sounds ?
-RunningMusic notification
 Make a server to have a real API?
 
 

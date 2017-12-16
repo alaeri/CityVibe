@@ -11,7 +11,6 @@ import org.alaeri.cityvibe.cityvibe.R
 import org.alaeri.cityvibe.model.DataManager
 import org.alaeri.cityvibe.model.RefreshResults
 import org.alaeri.cityvibe.model.Song
-import java.sql.Ref
 import java.util.*
 
 
@@ -19,7 +18,7 @@ class HomeActivity : AppCompatActivity() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    lateinit var  dataManager : DataManager
+    private lateinit var  dataManager : DataManager
 
     private val displayedSongs = ArrayList<Song>()
 
