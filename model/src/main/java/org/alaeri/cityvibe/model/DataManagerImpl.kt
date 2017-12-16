@@ -18,6 +18,7 @@ import retrofit2.http.Query
 class DataManagerImpl: DataManager {
 
     private val itunesAPI: ItunesAPI
+    private val chartsAPI: ChartAPI
 
     private val popularSongs = ArrayList<Song>()
 
@@ -28,20 +29,27 @@ class DataManagerImpl: DataManager {
                 .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
         itunesAPI = retrofitItunes.create(ItunesAPI::class.java)
+
+        val retrofitCharts = Retrofit.Builder()
+                .baseUrl("https://rss.itunes.apple.com/")
+                .addConverterFactory(MoshiConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .build()
+        chartsAPI = retrofitCharts.create(ChartAPI::class.java)
     }
 
     override fun refreshPopular(): Single<RefreshResults> =
-        itunesAPI.search("Animal Collective")
+        chartsAPI.topChartsUs()
                 .map {
                     Log.d("DataManagerImpl","$it")
-                    it.results.map {
-                        Song(it.trackName, it.artistName, it.artworkUrl100, it.previewUrl)
+                    it.feed.results.map {
+                        Song(it.name, it.artistName, it.artworkUrl100)
                     } // We map to a format we can use
                 }
                 .map {
                     when(it) {
-                        popularSongs -> RefreshResults.NoChange(it) as RefreshResults
-                        else -> RefreshResults.NewResults(it) as RefreshResults //???
+                        popularSongs -> RefreshResults.NoChange(it)
+                        else -> RefreshResults.NewResults(it)
                     }
 
                 }
@@ -52,6 +60,29 @@ class DataManagerImpl: DataManager {
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+
+    override fun search(term: String) =
+            itunesAPI.search(term)
+                    .map {
+                        Log.d("DataManagerImpl","$it")
+                        it.results.map {
+                            Song(it.trackName, it.artistName, it.artworkUrl100)
+                        } // We map to a format we can use
+                    }
+                    .map {
+                        when(it) {
+                            popularSongs -> RefreshResults.NoChange(it)
+                            else -> RefreshResults.NewResults(it)
+                        }
+
+                    }
+                    .doOnSuccess { it -> popularSongs.clear(); popularSongs.addAll(it.songs) }
+                    .onErrorReturn {
+                        Log.e("DataManagerImpl","Exception: $it")
+                        return@onErrorReturn  RefreshResults.NoConnection(songs = popularSongs)
+                    }
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
 
 }
 
@@ -64,7 +95,7 @@ interface ItunesAPI {
 
 
     @GET("search?media=music&entity=song")
-    fun search(@Query("term") action: String):
+    fun search(@Query("term") term: String):
             Single<ItunesSongSearchResult>
 
 
@@ -73,5 +104,11 @@ interface ItunesAPI {
 
 interface ChartAPI {
 
-    //GET https://api.music.apple.com/v1/catalog/{storefront}/charts?types={types}
+    data class FeedResponse(val feed: Feed)
+    data class Feed(val results: List<RSSResultItem>)
+    data class RSSResultItem(val name: String, val artistName: String, val artworkUrl100: String)
+
+    @GET("api/v1/us/apple-music/hot-tracks/all/100/explicit.json")
+    fun topChartsUs() : Single<FeedResponse>
+
 }

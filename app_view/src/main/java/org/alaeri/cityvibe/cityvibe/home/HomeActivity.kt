@@ -1,17 +1,16 @@
 package org.alaeri.cityvibe.cityvibe.home
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_home.*
 import org.alaeri.cityvibe.cityvibe.R
 import org.alaeri.cityvibe.model.DataManager
 import org.alaeri.cityvibe.model.DataManagerImpl
+import org.alaeri.cityvibe.model.PlayableSong
 import org.alaeri.cityvibe.model.Song
-import java.util.ArrayList
-import android.support.v4.widget.SwipeRefreshLayout
-
+import java.util.*
 
 
 class HomeActivity : AppCompatActivity() {
@@ -31,7 +30,6 @@ class HomeActivity : AppCompatActivity() {
         songListView.adapter = songsAdapter
         swiperefresh.setOnRefreshListener { refresh() }
         refresh()
-
 
     }
 
