@@ -1,5 +1,6 @@
 package org.alaeri.cityvibe.home
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
@@ -12,18 +13,28 @@ import org.alaeri.cityvibe.cityvibe.CityVibeApp
 import org.alaeri.cityvibe.model.DataManager
 import org.alaeri.cityvibe.model.RefreshResults
 import org.alaeri.cityvibe.model.Song
+import org.alaeri.cityvibe.player.PlayerActivity
 import java.util.*
 
 
 class HomeActivity : AppCompatActivity() {
 
+    companion object {
+        const val KEY_EXTRA_SONG = "SONG"
+
+    }
+
     private val compositeDisposable = CompositeDisposable()
 
-    private lateinit var  dataManager : DataManager
+    private lateinit var dataManager : DataManager
 
     private val displayedSongs = ArrayList<Song>()
 
-    private val songsAdapter = SongsAdapter(displayedSongs)
+    private val songsAdapter = SongsAdapter(displayedSongs) {
+        val intent = Intent(this, PlayerActivity::class.java)
+        intent.putExtra(KEY_EXTRA_SONG, it)
+        startActivity(intent)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

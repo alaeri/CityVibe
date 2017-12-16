@@ -45,12 +45,12 @@ class DataManagerImpl: DataManager {
                 .map {
                     Log.d("DataManagerImpl","$it")
                     it.feed.results.map {
-                        Song(it.name, it.artistName, it.artworkUrl100)
+                        Song(it.name, it.artistName, it.artworkUrl100, it.id)
                     } // We map to a format we can use
                 }
                 .map {
                     when {
-                        it.isSame(popularSongs) -> RefreshResults.NoChange(it)
+                        it.isEqual(popularSongs) -> RefreshResults.NoChange(it)
                         else -> RefreshResults.NewResults(it)
                     }
                 }
@@ -62,19 +62,14 @@ class DataManagerImpl: DataManager {
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
 
-    private fun <T> List<T>.isSame(o: List<T>): Boolean  {
-        val temp = ArrayList(this)
-        temp.retainAll(o)
-        Log.d("DataManagerImpl","size: ${temp.size} / ${this.size}")
-        return temp.size == this.size
-    }
+
 
     override fun search(term: String) =
             itunesAPI.search(term)
                     .map {
                         Log.d("DataManagerImpl","$it")
-                        it.results.map {
-                            Song(it.trackName, it.artistName, it.artworkUrl100)
+                        it.results.filter{ it.kind == "song"}.map {
+                            Song(it.trackName, it.artistName, it.artworkUrl100, it.trackId)
                         } // We map to a format we can use
                     }
                     .doOnError {
@@ -84,6 +79,21 @@ class DataManagerImpl: DataManager {
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
 
+    override fun populateSong(id: String) = itunesAPI.lookupSong(id)
+            .map {
+                val result = it.results.first()
+                PlayableSong(result.trackName, result.artistName, result.artworkUrl100, result.previewUrl, result.trackId)
+            }
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+
+}
+
+private fun <T> List<T>.isEqual(o: List<T>): Boolean  {
+    val temp = ArrayList(this)
+    temp.retainAll(o)
+    Log.d("DataManagerImpl","size: ${temp.size} / ${this.size}")
+    return temp.size == this.size
 }
 
 interface ItunesAPI {
@@ -91,12 +101,16 @@ interface ItunesAPI {
 
     data class ItunesSongSearchResult(val count: Int, val results: List<ItunesSongSearchResultItem>)
     data class ItunesSongSearchResultItem(val trackName: String, val artistName: String,
-                                          val previewUrl: String, val artworkUrl100: String)
+                                          val previewUrl: String, val artworkUrl100: String,
+                                          val kind: String, val trackId: String)
 
 
     @GET("search?media=music&entity=song")
-    fun search(@Query("term") term: String):
-            Single<ItunesSongSearchResult>
+    fun search(@Query("term") term: String): Single<ItunesSongSearchResult>
+
+//    https://itunes.apple.com/lookup?id=909253&entity=album
+    @GET("lookup?entity=song")
+    fun lookupSong(@Query("id") songId: String): Single<ItunesSongSearchResult>
 
 }
 
@@ -105,7 +119,7 @@ interface ChartAPI {
 
     data class FeedResponse(val feed: Feed)
     data class Feed(val results: List<RSSResultItem>)
-    data class RSSResultItem(val name: String, val artistName: String, val artworkUrl100: String)
+    data class RSSResultItem(val name: String, val artistName: String, val artworkUrl100: String, val id: String)
 
     @GET("api/v1/us/apple-music/hot-tracks/all/100/explicit.json")
     fun topChartsUs() : Single<FeedResponse>

@@ -16,11 +16,16 @@ import org.alaeri.cityvibe.model.Song
  * This class displays data in the song list view
  */
 
-class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+class VH(itemView: View, onClick: (Song) -> Unit) : RecyclerView.ViewHolder(itemView) {
 
     val titleTextView : AppCompatTextView = itemView.titleTextView
     val artistTextView : AppCompatTextView = itemView.artistTextView
     val coverThumbImageView : AppCompatImageView = itemView.coverThumbImageView
+    var song : Song? = null
+
+    init {
+        itemView.setOnClickListener { song?.let { onClick(it) } }
+    }
 
 
 }
@@ -28,12 +33,13 @@ class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
  * Simple songs adapter
  *
  */
-class SongsAdapter(private val songs: List<Song>) : RecyclerView.Adapter<VH>() {
+class SongsAdapter(private val songs: List<Song>, private val  onClick : (Song) -> Unit) : RecyclerView.Adapter<VH>() {
 
     private var layoutInflater : LayoutInflater? = null
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val song = songs[position]
+        holder.song = song
         holder.artistTextView.text = song.artist
         holder.titleTextView.text = song.title
         Glide.with(holder.coverThumbImageView).load(song.coverUrl).into(holder.coverThumbImageView)
@@ -46,7 +52,7 @@ class SongsAdapter(private val songs: List<Song>) : RecyclerView.Adapter<VH>() {
             layoutInflater = li
         }
         val view = li.inflate(R.layout.song_list_item, parent, false)
-        return VH(view)
+        return VH(view, onClick)
     }
 
     override fun getItemCount(): Int {
