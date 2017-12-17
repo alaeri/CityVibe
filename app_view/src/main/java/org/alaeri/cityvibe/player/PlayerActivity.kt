@@ -10,11 +10,15 @@ import android.view.View
 import be.rijckaert.tim.animatedvector.FloatingMusicActionButton
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_player.*
+import ooo.oxo.library.widget.PullBackLayout
 import org.alaeri.cityvibe.R
 import org.alaeri.cityvibe.cityvibe.CityVibeApp
 import org.alaeri.cityvibe.home.HomeActivity
 import org.alaeri.cityvibe.model.DataManager
 import org.alaeri.cityvibe.model.Song
+
+
+
 
 /**
  * Created by Emmanuel Requier on 16/12/2017.
@@ -23,22 +27,27 @@ import org.alaeri.cityvibe.model.Song
  */
 class PlayerActivity: AppCompatActivity() {
 
+
     private val compositeDispo = CompositeDisposable()
     private val mp = MediaPlayer()
     private lateinit var dataManager : DataManager
     private lateinit var songs :  ArrayList<Song>
     private var songPosition : Int = 0
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_player)
         supportPostponeEnterTransition()
-        dataManager = (application  as CityVibeApp).dataManager
+        setContentView(R.layout.activity_player)
 
+
+        dataManager = (application  as CityVibeApp).dataManager
         songPosition = intent.extras[HomeActivity.KEY_EXTRA_SELECTED_SONG_POSITION] as Int
         songs = intent.extras[HomeActivity.KEY_EXTRA_SONGS] as ArrayList<Song> // :*(
+        val viewPagerAdapter = SongPagerAdapter(this, songs)
 
-        viewPager.adapter = SongPagerAdapter(this, songs)
+
+        viewPager.adapter = viewPagerAdapter
         viewPager.currentItem = songPosition
         viewPager.setPageTransformer(true, DepthPageTransformer())
 
@@ -62,7 +71,16 @@ class PlayerActivity: AppCompatActivity() {
             }
         })
 
-        quitButton.setOnClickListener{ finish() } //TODO Add transition to bottom
+        //TODO fix transition issue (transparency and conflict with changeBounds enter animation)
+        puller.setCallback(object: PullBackLayout.Callback{
+            override fun onPullStart() {}
+
+            override fun onPull(p0: Float) {}
+
+            override fun onPullCancel() {}
+
+            override fun onPullComplete() = supportFinishAfterTransition()
+        })
     }
 
     override fun onStart() {

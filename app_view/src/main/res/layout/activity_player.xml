@@ -1,85 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ooo.oxo.library.widget.PullBackLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:background="@color/colorPrimaryDark"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/puller"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@null"
-        android:textSize="64sp"
-        android:layout_gravity="center_horizontal"
-        android:textColor="@color/colorAccent"
-        android:id="@+id/quitButton"
-        android:text="✗"
-        tools:ignore="HardcodedText" />
-    <!--Match parent is mandatory here because viewpager doesnt work with 0dp in this case :/-->
-    <android.support.v4.view.ViewPager
-        android:id="@+id/viewPager"
+    android:layout_height="match_parent"
+    >
+
+    <LinearLayout
+        android:id="@+id/draggableFrame"
+        android:background="@color/colorPrimaryDark"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        tools:ignore="InefficientWeight" />
-    <android.support.constraint.ConstraintLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingLeft="40dp"
-        android:paddingRight="40dp"
-        android:paddingBottom="40dp"
-        android:clipToPadding="false"
+        android:orientation="vertical"
+        android:paddingTop="?actionBarSize"
         >
-        <TextView
-            android:id="@+id/bufferingTextView"
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@null"
+            android:textSize="64sp"
+            android:layout_gravity="center_horizontal"
             android:textColor="@color/colorAccent"
-            android:text="@string/buffering"
-            android:textSize="12sp"
-            android:layout_marginTop="@dimen/margin"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
-        <ImageButton
-            android:background="@null"
-            android:id="@+id/previousButton"
-            android:layout_width="wrap_content"
+            android:id="@+id/quitButton"
+            android:text="✗"
+            tools:ignore="HardcodedText" />
+        <!--Match parent is mandatory here because viewpager doesnt work with 0dp in this case :/-->
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            tools:ignore="InefficientWeight" />
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scaleType="centerInside"
-            android:layout_marginTop="40dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/playButton"
-            android:src="@android:drawable/ic_media_previous"
-            android:contentDescription="@string/previous" />
-        <be.rijckaert.tim.animatedvector.FloatingMusicActionButton
-            android:id="@+id/playButton"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            app:backgroundTint="@color/colorAccent"
-            android:layout_gravity="center"
-            app:mode="playToPause"
-            android:layout_marginTop="40dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/previousButton"
-            app:layout_constraintEnd_toStartOf="@id/nextButton"
-             />
-        <ImageButton
-            android:background="@null"
-            android:id="@+id/nextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="centerInside"
-            android:layout_marginTop="40dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/playButton"
-            android:src="@android:drawable/ic_media_next"
-            android:contentDescription="@string/next"/>
-    </android.support.constraint.ConstraintLayout>
-</LinearLayout>
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp"
+            android:paddingBottom="40dp"
+            android:clipToPadding="false"
+            >
+            <TextView
+                android:id="@+id/bufferingTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/colorAccent"
+                android:text="@string/buffering"
+                android:textSize="12sp"
+                android:layout_marginTop="@dimen/margin"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+            <ImageButton
+                android:background="@null"
+                android:id="@+id/previousButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                android:layout_marginTop="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/playButton"
+                android:src="@android:drawable/ic_media_previous"
+                android:contentDescription="@string/previous" />
+            <be.rijckaert.tim.animatedvector.FloatingMusicActionButton
+                android:id="@+id/playButton"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                app:backgroundTint="@color/colorAccent"
+                android:layout_gravity="center"
+                app:mode="playToPause"
+                android:layout_marginTop="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/previousButton"
+                app:layout_constraintEnd_toStartOf="@id/nextButton"
+                />
+            <ImageButton
+                android:background="@null"
+                android:id="@+id/nextButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scaleType="centerInside"
+                android:layout_marginTop="40dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/playButton"
+                android:src="@android:drawable/ic_media_next"
+                android:contentDescription="@string/next"/>
+        </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
+</ooo.oxo.library.widget.PullBackLayout>

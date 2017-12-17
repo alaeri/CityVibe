@@ -20,7 +20,8 @@
         </activity>
         <activity
             android:name="org.alaeri.cityvibe.player.PlayerActivity"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:theme="@style/PlayerTheme">
         </activity>
     </application>
 
