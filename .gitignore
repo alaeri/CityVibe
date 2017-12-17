@@ -9,3 +9,6 @@
 /captures
 .externalNativeBuild
 /.idea/**
+/app_view/build
+/model/build
+/presenter/build

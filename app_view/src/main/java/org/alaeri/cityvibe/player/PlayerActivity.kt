@@ -6,11 +6,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.view.PagerAdapter
 import android.support.v4.view.ViewCompat
+import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import be.rijckaert.tim.animatedvector.FloatingMusicActionButton
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
 import com.bumptech.glide.load.engine.GlideException
@@ -22,6 +24,7 @@ import kotlinx.android.synthetic.main.page_song.view.*
 import org.alaeri.cityvibe.R
 import org.alaeri.cityvibe.cityvibe.CityVibeApp
 import org.alaeri.cityvibe.home.HomeActivity
+import org.alaeri.cityvibe.model.DataManager
 import org.alaeri.cityvibe.model.Song
 
 /**
@@ -31,43 +34,66 @@ class PlayerActivity: AppCompatActivity() {
 
     private val compositeDispo = CompositeDisposable()
     private val mp = MediaPlayer()
+    private lateinit var dataManager : DataManager
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_player)
         supportPostponeEnterTransition()
+        dataManager = (application  as CityVibeApp).dataManager
 
         val songPosition = intent.extras[HomeActivity.KEY_EXTRA_SELECTED_SONG_POSITION] as Int
         val songs = intent.extras[HomeActivity.KEY_EXTRA_SONGS] as ArrayList<*>
-        val song = songs[songPosition] as Song
 
         viewPager.adapter = SongPagerAdapter(songs as ArrayList<Song>)
         viewPager.currentItem = songPosition
-//        viewPager.setPageTransformer(true, DepthPageTransformer())
+        viewPager.setPageTransformer(true, DepthPageTransformer())
 
-        val dataManager = (application  as CityVibeApp).dataManager
+        viewPager.addOnPageChangeListener(object : ViewPager.OnPageChangeListener{
+            override fun onPageScrollStateChanged(state: Int) {}
+
+            override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
+
+            override fun onPageSelected(position: Int) {
+                startPlayback(songs[position])
+            }
+        })
+
+        previousButton.setOnClickListener { viewPager.setCurrentItem(viewPager.currentItem-1, true)}
+        nextButton.setOnClickListener { viewPager.setCurrentItem(viewPager.currentItem+1, true)}
+        mp.setOnCompletionListener { viewPager.setCurrentItem(viewPager.currentItem+1, true) }
+        playButton.setOnMusicFabClickListener(object : FloatingMusicActionButton.OnMusicFabClickListener{
+            override fun onClick(view: View) {
+                if(mp.isPlaying)  mp.pause() else mp.start()
+            }
+        })
+        quitButton.setOnClickListener{ finish() } //Add transition to bottom
+        startPlayback(songs[songPosition])
+    }
+
+    override fun onPause() {
+        super.onPause()
+        clean()
+    }
+
+    private fun startPlayback(song: Song){
+        compositeDispo.clear()
 
         val sub = dataManager.populateSong(song.id).subscribe { it ->
 
             Log.d("PlayerActivity", "Playable song: $it")
             mp.reset()
             mp.setDataSource(this, Uri.parse(it.previewUrl))
-            mp.prepare()
-            mp.start()
+            mp.prepareAsync()
+            mp.setOnPreparedListener {
+                mp.start()
+                playButton.changeMode(FloatingMusicActionButton.Mode.PAUSE_TO_PLAY)
+            }
+
 
         }
         compositeDispo.add(sub)
-
-        quitButton.setOnClickListener{ finish() } //Add transition to bottom
-        mp.setOnCompletionListener { finish() }
-
-//        supportStartPostponedEnterTransition()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        clean()
     }
 
     private fun clean() {
@@ -115,7 +141,6 @@ class PlayerActivity: AppCompatActivity() {
             ViewCompat.setTransitionName(view.coverLargeImageView, song.coverUrl)
             view.titleTextView.text = song.title
             view.artistTextView.text = song.artist
-            supportStartPostponedEnterTransition()
         }
 
 
