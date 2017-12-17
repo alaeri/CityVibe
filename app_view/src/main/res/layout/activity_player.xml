@@ -16,56 +16,12 @@
         android:id="@+id/quitButton"
         android:text="✗"
         tools:ignore="HardcodedText" />
-    <android.support.constraint.ConstraintLayout
+    <android.support.v4.view.ViewPager
+        android:id="@+id/viewPager"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="1"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="40dp"
-        android:layout_marginEnd="40dp"
-        >
-        <org.alaeri.cityvibe.player.SquaredImageViewCompat
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/titleTextView"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="20dp"
-            android:background="@drawable/cover_thumb_bg"
-            android:scaleType="centerCrop"
-            android:id="@+id/coverLargeImageView"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/titleTextView"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:lines="1"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:gravity="center"
-            android:ellipsize="end"
-            android:textColor="#FFFFFF"
-
-            app:layout_constraintBottom_toTopOf="@id/artistTextView"
-            tools:text="LONG SONGT TITLE TRY TO BREAK LAYOUT"/>
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/artistTextView"
-            android:textSize="14sp"
-            android:lines="1"
-            android:gravity="center"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:ellipsize="end"
-            android:textColor="#FFFFFF"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="40dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            tools:text="This artist name is bigger than the world"/>
-    </android.support.constraint.ConstraintLayout>
+        />
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

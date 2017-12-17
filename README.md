@@ -30,6 +30,8 @@ A few rules:
 * [x] Search view and results
 * [x] Map a song to a playable song by querying for previewUrl
 * [x] Basic player
+* [x] Nicer ui
+* [ ] Pagination songs
 * [ ] MediaService
 * [ ] Currently playing notification
 
