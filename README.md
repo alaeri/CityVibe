@@ -31,18 +31,29 @@ A few rules:
 * [x] Map a song to a playable song by querying for previewUrl
 * [x] Basic player
 * [x] Nicer ui
-* [ ] Pagination songs
+* [x] Pagination songs
+* [x] Drag to dismiss
+* [ ] Basic MVP arch
 * [ ] MediaService
 * [ ] Currently playing notification
 
 ## BACKLOG
 
-Make a better search with throttling
-Make a real DI rather than having a dataManager singleton in CityVibeApp ?
-Add a persistence layer ?
-FlavorDimension for sound provider ? Maybe first spotify as I have a premium account
-FlavorDimension for technicalTest and Cityvibe with geotagged sounds ?
-Make a server to have a real API?
+* Conductor instead of activities?
+* Focus and keyboard issues
+* Make a better search with throttling
+* Make a real DI rather than having a dataManager singleton in CityVibeApp ?
+* Add a persistence layer ?
+* FlavorDimension for sound provider ? Maybe first spotify as I have a premium account
+* FlavorDimension for technicalTest and Cityvibe with geotagged sounds ?
+* Make a server to have a real API?
+* Uber RIBS ??
+* SideMenu
+  * Opensource libraries page
+  * with github link
+  * README
+
+
 
 
 
