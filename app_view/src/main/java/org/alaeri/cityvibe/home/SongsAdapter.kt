@@ -26,8 +26,6 @@ class VH(itemView: View, onClick: (Int, AppCompatImageView) -> Unit) : RecyclerV
     init {
         itemView.setOnClickListener { onClick(this.adapterPosition, coverThumbImageView) }
     }
-
-
 }
 /**
  * Simple songs adapter

@@ -6,6 +6,8 @@ import android.view.View
 
 /**
  * Created by Emmanuel Requier on 16/12/2017.
+ * From Google documentation > simply converted automatically to Kotlin
+ *
  */
 class DepthPageTransformer : ViewPager.PageTransformer {
 

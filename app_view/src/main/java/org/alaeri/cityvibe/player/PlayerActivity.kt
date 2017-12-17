@@ -1,26 +1,15 @@
 package org.alaeri.cityvibe.player
 
-import android.graphics.drawable.Drawable
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
-import android.support.v4.view.PagerAdapter
-import android.support.v4.view.ViewCompat
 import android.support.v4.view.ViewPager
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import be.rijckaert.tim.animatedvector.FloatingMusicActionButton
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.DataSource
-import com.bumptech.glide.load.engine.GlideException
-import com.bumptech.glide.request.RequestListener
-import com.bumptech.glide.request.target.Target
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_player.*
-import kotlinx.android.synthetic.main.page_song.view.*
 import org.alaeri.cityvibe.R
 import org.alaeri.cityvibe.cityvibe.CityVibeApp
 import org.alaeri.cityvibe.home.HomeActivity
@@ -29,13 +18,16 @@ import org.alaeri.cityvibe.model.Song
 
 /**
  * Created by Emmanuel Requier on 16/12/2017.
+ * This activity displays control buttons and a larger view of the selected song in a viewpager
+ *
  */
 class PlayerActivity: AppCompatActivity() {
 
     private val compositeDispo = CompositeDisposable()
     private val mp = MediaPlayer()
     private lateinit var dataManager : DataManager
-
+    private lateinit var songs :  ArrayList<Song>
+    private var songPosition : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,10 +35,10 @@ class PlayerActivity: AppCompatActivity() {
         supportPostponeEnterTransition()
         dataManager = (application  as CityVibeApp).dataManager
 
-        val songPosition = intent.extras[HomeActivity.KEY_EXTRA_SELECTED_SONG_POSITION] as Int
-        val songs = intent.extras[HomeActivity.KEY_EXTRA_SONGS] as ArrayList<*>
+        songPosition = intent.extras[HomeActivity.KEY_EXTRA_SELECTED_SONG_POSITION] as Int
+        songs = intent.extras[HomeActivity.KEY_EXTRA_SONGS] as ArrayList<Song> // :*(
 
-        viewPager.adapter = SongPagerAdapter(songs as ArrayList<Song>)
+        viewPager.adapter = SongPagerAdapter(this, songs)
         viewPager.currentItem = songPosition
         viewPager.setPageTransformer(true, DepthPageTransformer())
 
@@ -56,6 +48,7 @@ class PlayerActivity: AppCompatActivity() {
             override fun onPageScrolled(position: Int, positionOffset: Float, positionOffsetPixels: Int) {}
 
             override fun onPageSelected(position: Int) {
+                songPosition = position
                 startPlayback(songs[position])
             }
         })
@@ -68,85 +61,50 @@ class PlayerActivity: AppCompatActivity() {
                 if(mp.isPlaying)  mp.pause() else mp.start()
             }
         })
-        quitButton.setOnClickListener{ finish() } //Add transition to bottom
-        startPlayback(songs[songPosition])
+
+        quitButton.setOnClickListener{ finish() } //TODO Add transition to bottom
+    }
+
+    override fun onStart() {
+        super.onStart()
+        startPlayback( songs[songPosition] )
     }
 
     override fun onPause() {
         super.onPause()
-        clean()
+        bufferingTextView.visibility = View.INVISIBLE
+        compositeDispo.clear()
+        mp.reset()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        mp.release()
     }
 
     private fun startPlayback(song: Song){
         compositeDispo.clear()
+        mp.reset()
+        bufferingTextView.text = getString(R.string.loading)
+        bufferingTextView.visibility = View.VISIBLE
 
-        val sub = dataManager.populateSong(song.id).subscribe { it ->
+        val sub = dataManager.populateSong(song.id).subscribe ({ it ->
 
             Log.d("PlayerActivity", "Playable song: $it")
-            mp.reset()
             mp.setDataSource(this, Uri.parse(it.previewUrl))
             mp.prepareAsync()
+            bufferingTextView.visibility = View.VISIBLE
+            bufferingTextView.text = getString(R.string.buffering)
             mp.setOnPreparedListener {
                 mp.start()
+                bufferingTextView.visibility = View.INVISIBLE
                 playButton.changeMode(FloatingMusicActionButton.Mode.PAUSE_TO_PLAY)
             }
-
-
-        }
+        },{
+           bufferingTextView.text = getString(R.string.no_network)
+           bufferingTextView.visibility = View.VISIBLE
+        })
         compositeDispo.add(sub)
     }
 
-    private fun clean() {
-        compositeDispo.clear()
-        mp.reset()
-        mp.release()
-    }
-
-    inner class SongPagerAdapter(private val songs: List<Song>) : PagerAdapter() {
-
-        private var layoutInflater : LayoutInflater? = null
-
-        override fun isViewFromObject(view: View, `object`: Any): Boolean {
-            return view == `object`
-        }
-
-        override fun getCount(): Int = songs.size
-
-        override fun instantiateItem(container: ViewGroup, position: Int): Any {
-            var li = layoutInflater
-            if( li == null) {
-                li = LayoutInflater.from(container.context)!!
-                layoutInflater = li
-            }
-            val  view = li.inflate(R.layout.page_song, container, false )
-            container.addView(view)
-            populatePage(position, view)
-            return view
-        }
-
-        private fun populatePage(position: Int, view: View) {
-            val song = songs[position]
-            Log.d("PlayerActivity", "Display song: $song")
-            Glide.with(view.context).load(song.coverUrl).listener(object : RequestListener<Drawable> {
-                override fun onResourceReady(resource: Drawable, model: Any, target: Target<Drawable>, dataSource: DataSource, isFirstResource: Boolean): Boolean {
-                    supportStartPostponedEnterTransition()
-                    return false
-                }
-
-                override fun onLoadFailed(e: GlideException?, model: Any?, target: Target<Drawable>, isFirstResource: Boolean): Boolean {
-                    supportStartPostponedEnterTransition()
-                    return false
-                }
-            }).into(view.coverLargeImageView)
-            ViewCompat.setTransitionName(view.coverLargeImageView, song.coverUrl)
-            view.titleTextView.text = song.title
-            view.artistTextView.text = song.artist
-        }
-
-
-
-        override fun destroyItem(container: ViewGroup, position: Int, `object`: Any) {
-//            Glide.with(container.context).clear()
-        }
-    }
 }

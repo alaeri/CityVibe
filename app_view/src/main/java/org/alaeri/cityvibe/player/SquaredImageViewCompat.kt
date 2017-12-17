@@ -2,6 +2,7 @@ package org.alaeri.cityvibe.player
 
 /**
  * Created by Emmanuel Requier on 16/12/2017.
+ * From the internet. Same as usual
  */
 import android.content.Context
 import android.support.v7.widget.AppCompatImageView

@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">Cityvibe</string>
     <string name="no_changes">No changes in top charts</string>
-    <string name="no_network">Could not refresh</string>
+    <string name="no_network">no network</string>
+    <string name="buffering">buffering</string>
+    <string name="previous">previous song</string>
+    <string name="next">next song</string>
+    <string name="loading">loading</string>
 </resources>
