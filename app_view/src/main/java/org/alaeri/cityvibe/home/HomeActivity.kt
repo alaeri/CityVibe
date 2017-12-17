@@ -1,35 +1,29 @@
 package org.alaeri.cityvibe.home
 
 import android.content.Intent
-import android.os.Build
-import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import android.support.v4.app.ActivityOptionsCompat
+import android.support.v4.view.ViewCompat
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
 import android.widget.Toast
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.activity_home.*
+import org.alaeri.cityvibe.BaseActivity
 import org.alaeri.cityvibe.R
-import org.alaeri.cityvibe.cityvibe.CityVibeApp
-import org.alaeri.cityvibe.model.DataManager
-import org.alaeri.cityvibe.model.RefreshResults
 import org.alaeri.cityvibe.model.Song
 import org.alaeri.cityvibe.player.PlayerActivity
+import org.alaeri.cityvibe.presenter.HomePresenter
+import org.alaeri.cityvibe.presenter.IHomePresenter
 import java.util.*
-import android.support.v4.view.ViewCompat
-import android.support.v4.app.ActivityOptionsCompat
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : BaseActivity<IHomePresenter, IHomePresenter.View>(), IHomePresenter.View{
+
 
     companion object {
         const val KEY_EXTRA_SELECTED_SONG_POSITION = "SELECTED_SONG_POSITION"
         const val KEY_EXTRA_SONGS = "SONGS"
-
     }
 
-    private val compositeDisposable = CompositeDisposable()
-
-    private lateinit var dataManager : DataManager
+    override var presenter: HomePresenter = HomePresenter(this)
 
     private val displayedSongs = ArrayList<Song>()
 
@@ -44,72 +38,50 @@ class HomeActivity : AppCompatActivity() {
        startActivity(intent, options.toBundle())
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        dataManager = (this.application as CityVibeApp).dataManager
-
+    override fun setContent() {
         setContentView(R.layout.activity_home)
+        searchView.run {
+            setIconifiedByDefault(false) // Do not iconify the widget; expand it by default
+            setOnQueryTextListener(object: SearchView.OnQueryTextListener{
+                override fun onQueryTextSubmit(query: String): Boolean = query(query)
+                override fun onQueryTextChange(newText: String): Boolean = query(newText)
+            })
+        }
 
-        searchView.setIconifiedByDefault(false) // Do not iconify the widget; expand it by default
-        searchView.setOnQueryTextListener(object: SearchView.OnQueryTextListener{
-
-            override fun onQueryTextSubmit(query: String): Boolean = query(query)
-
-            override fun onQueryTextChange(newText: String): Boolean = query(newText)
-
-        })
-
-
-        songListView.layoutManager = LinearLayoutManager(this)
-        songListView.adapter = songsAdapter
+        songListView.run {
+            layoutManager = LinearLayoutManager(this@HomeActivity)
+            adapter = songsAdapter
+        }
 
         swiperefresh.setOnRefreshListener { refresh() }
-        initTopCharts()
-
     }
 
-    private fun query(newText: String): Boolean {
-        if (newText.isEmpty()) {
-            replaceContentWith(dataManager.popularSongs)
-        } else {
-            val sub = dataManager.search(newText).subscribe { it ->
-                replaceContentWith(it)
-            }
-            compositeDisposable.add(sub)
-        }
-        return true
-    }
-
-    private fun initTopCharts() {
-        replaceContentWith(dataManager.popularSongs)
-        refresh()
-    }
-
-    private fun refresh() {
-        swiperefresh.isRefreshing = true
-        val sub = dataManager.refreshPopular().subscribe { it ->
-            when (it) {
-                is RefreshResults.NewResults -> {
-                    val songs = it.songs
-                    replaceContentWith(songs)
-                }
-                is RefreshResults.NoChange -> Toast.makeText(this, R.string.no_changes, Toast.LENGTH_SHORT).show()
-                is RefreshResults.NoConnection -> Toast.makeText(this, R.string.no_network, Toast.LENGTH_SHORT).show()
-            }
-            swiperefresh.isRefreshing = false
-        }
-        compositeDisposable.add(sub)
-    }
-
-    private fun replaceContentWith(songs: List<Song>) {
+    override fun replaceContentWith(songs: List<Song>) {
         displayedSongs.clear()
         displayedSongs.addAll(songs)
         songsAdapter.notifyDataSetChanged()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        compositeDisposable.clear()
+    override fun showAlert(alert: HomePresenter.Alert) {
+        when(alert) {
+            HomePresenter.Alert.NO_NETWORK -> Toast.makeText(this,R.string.no_network, Toast.LENGTH_SHORT).show()
+            else -> {}
+        }
     }
+
+    override fun stopRefreshing() {
+        swiperefresh.isRefreshing = false
+    }
+
+    private fun query(newText: String): Boolean {
+        presenter?.query(newText)
+        return true
+    }
+
+    private fun refresh() {
+        swiperefresh.isRefreshing = true
+        presenter?.onSwipeToRefresh()
+    }
+
+
 }

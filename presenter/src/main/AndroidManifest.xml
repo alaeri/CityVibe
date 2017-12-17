@@ -1,0 +1,4 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.alaeri.cityvibe.model" >
+    <uses-permission android:name="android.permission.INTERNET" />
+</manifest>
