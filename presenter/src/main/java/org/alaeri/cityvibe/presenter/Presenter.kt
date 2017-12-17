@@ -21,7 +21,7 @@ interface BaseAppView {
 
 interface AppView<P : AppPresenter<P, V>, V: AppView<P, V>> : BaseAppView
 
-abstract class BaseAppPresenter<P : AppPresenter<P, V>, V: AppView<P, V>>(v: V) : AppPresenter<P, V> {
+abstract class BaseAppPresenter<P : AppPresenter<P, V>, V: AppView<P, V>> : AppPresenter<P, V> {
 
     private var _view : V? = null
     protected val view: V?

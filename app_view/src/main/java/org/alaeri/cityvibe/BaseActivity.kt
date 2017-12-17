@@ -13,11 +13,11 @@ import org.alaeri.cityvibe.presenter.AppView
 abstract class BaseActivity<P: AppPresenter<P, V>, V: AppView<P,V>> :  AppCompatActivity(), AppView<P,V>{
 
     abstract val presenter : P
-    abstract fun setContent()
+    abstract fun setContentBeforePresenterStarts()
 
     final override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent()
+        setContentBeforePresenterStarts()
         presenter.onStart(this as V)
     }
 

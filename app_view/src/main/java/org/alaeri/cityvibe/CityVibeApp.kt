@@ -9,7 +9,9 @@ import org.alaeri.cityvibe.model.DataManagerImpl
  */
 class CityVibeApp: Application() {
 
-    val dataManager : DataManager = DataManagerImpl()
+    val dataManager : DataManager = DataManagerImpl(this)
+
+
 
 
 }

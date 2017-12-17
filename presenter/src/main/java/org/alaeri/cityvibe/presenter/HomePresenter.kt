@@ -6,20 +6,28 @@ import org.alaeri.cityvibe.model.Song
 
 /**
  * Created by Emmanuel Requier on 17/12/2017.
+ *
  */
 
 interface IHomePresenter : AppPresenter<IHomePresenter, IHomePresenter.View> {
+
+    fun query(term: String)
+    fun onSwipeToRefresh()
+    fun openSong(position: Int, animatedProperties: Any?)
 
     interface View : AppView<IHomePresenter, View> {
         fun replaceContentWith(songs: List<Song>)
         fun showAlert(alert: HomePresenter.Alert)
         fun stopRefreshing()
+        fun openPlayer(animatedProperties: Any?)
     }
 }
 
-class HomePresenter(view: IHomePresenter.View) : IHomePresenter, BaseAppPresenter<IHomePresenter, IHomePresenter.View>(view) {
+class HomePresenter: IHomePresenter, BaseAppPresenter<IHomePresenter, IHomePresenter.View>() {
+
 
     private val compositeDisposable = CompositeDisposable()
+    private var currentResults : List<Song>? = null
 
     enum class Alert{
         NO_NETWORK,
@@ -27,7 +35,7 @@ class HomePresenter(view: IHomePresenter.View) : IHomePresenter, BaseAppPresente
     }
 
     override fun start() {
-        view?.replaceContentWith(dataManager.popularSongs)
+        replaceContentWith(dataManager.popularSongs)
         onSwipeToRefresh()
     }
 
@@ -39,18 +47,18 @@ class HomePresenter(view: IHomePresenter.View) : IHomePresenter, BaseAppPresente
         compositeDisposable.clear()
     }
 
-    fun query(newText: String) {
-        if (newText.isEmpty()) {
+    override fun query(term: String) {
+        if (term.isEmpty()) {
             replaceContentWith(dataManager.popularSongs)
         } else {
-            val sub = dataManager.search(newText).subscribe { it ->
+            val sub = dataManager.search(term).subscribe { it ->
                 replaceContentWith(it)
             }
             compositeDisposable.add(sub)
         }
     }
 
-    fun onSwipeToRefresh(){
+    override fun onSwipeToRefresh(){
         val sub = dataManager.refreshPopular().subscribe { it ->
             when (it) {
                 is RefreshResults.NewResults -> {
@@ -65,13 +73,16 @@ class HomePresenter(view: IHomePresenter.View) : IHomePresenter, BaseAppPresente
         compositeDisposable.add(sub)
     }
 
+    override fun openSong(position: Int, animatedProperties: Any?) {
+        dataManager.songQueue = currentResults!!
+        dataManager.positionInQueue = position
+        view?.openPlayer(animatedProperties)
+    }
+
     private fun replaceContentWith(songs: List<Song>){
         if(active) {
+            currentResults = songs
             view?.replaceContentWith(songs)
         }
     }
-
-
-
-
 }

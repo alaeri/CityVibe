@@ -1,5 +1,6 @@
 package org.alaeri.cityvibe.model
 
+import android.content.Context
 import android.util.Log
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -16,12 +17,15 @@ import kotlin.collections.ArrayList
  * We can skip persistence at first but we want to make the refresh work from the start
  *
  */
-class DataManagerImpl: DataManager {
+class DataManagerImpl(override var context: Context?): DataManager {
 
     private val itunesAPI: ItunesAPI
     private val chartsAPI: ChartAPI
 
+    //These fields should not be here but moved to an object representing app state ...
     override val popularSongs = ArrayList<Song>()
+    override var songQueue: List<Song> = ArrayList()
+    override var positionInQueue: Int = 0
 
     init {
         val retrofitItunes = Retrofit.Builder()

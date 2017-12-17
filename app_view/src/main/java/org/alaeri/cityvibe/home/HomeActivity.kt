@@ -3,8 +3,10 @@ package org.alaeri.cityvibe.home
 import android.content.Intent
 import android.support.v4.app.ActivityOptionsCompat
 import android.support.v4.view.ViewCompat
+import android.support.v7.widget.AppCompatImageView
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.SearchView
+import android.util.Log
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_home.*
 import org.alaeri.cityvibe.BaseActivity
@@ -17,28 +19,15 @@ import java.util.*
 
 class HomeActivity : BaseActivity<IHomePresenter, IHomePresenter.View>(), IHomePresenter.View{
 
-
-    companion object {
-        const val KEY_EXTRA_SELECTED_SONG_POSITION = "SELECTED_SONG_POSITION"
-        const val KEY_EXTRA_SONGS = "SONGS"
-    }
-
-    override var presenter: HomePresenter = HomePresenter(this)
+    override var presenter: IHomePresenter = HomePresenter()
 
     private val displayedSongs = ArrayList<Song>()
 
-    private val songsAdapter = SongsAdapter(displayedSongs) { position, sharedImageView ->
-        val intent = Intent(this, PlayerActivity::class.java)
-        intent.putExtra(KEY_EXTRA_SELECTED_SONG_POSITION, position)
-        intent.putExtra(KEY_EXTRA_SONGS, displayedSongs)
-        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
-                this,
-                sharedImageView,
-                ViewCompat.getTransitionName(sharedImageView))
-       startActivity(intent, options.toBundle())
-    }
+    private val songsAdapter = SongsAdapter(displayedSongs)
+            { position : Int, sharedImageView: AppCompatImageView ->
+                            presenter.openSong(position, sharedImageView) }
 
-    override fun setContent() {
+    override fun setContentBeforePresenterStarts() {
         setContentView(R.layout.activity_home)
         searchView.run {
             setIconifiedByDefault(false) // Do not iconify the widget; expand it by default
@@ -73,15 +62,23 @@ class HomeActivity : BaseActivity<IHomePresenter, IHomePresenter.View>(), IHomeP
         swiperefresh.isRefreshing = false
     }
 
+    override fun openPlayer(animatedProperties: Any?) {
+        Log.d("HomeActivity", "opening player..... $animatedProperties")
+        val intent = Intent(this, PlayerActivity::class.java)
+        val sharedImageView = animatedProperties as AppCompatImageView
+        val options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, sharedImageView,
+            ViewCompat.getTransitionName(sharedImageView))
+        startActivity(intent, options.toBundle())
+    }
+
     private fun query(newText: String): Boolean {
-        presenter?.query(newText)
+        presenter.query(newText)
         return true
     }
 
     private fun refresh() {
         swiperefresh.isRefreshing = true
-        presenter?.onSwipeToRefresh()
+        presenter.onSwipeToRefresh()
     }
-
 
 }

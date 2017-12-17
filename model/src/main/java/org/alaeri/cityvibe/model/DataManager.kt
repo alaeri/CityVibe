@@ -1,6 +1,7 @@
 package org.alaeri.cityvibe.model
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Parcelable
 import io.reactivex.Single
 import kotlinx.android.parcel.Parcelize
@@ -31,7 +32,10 @@ interface DataManager {
 
     fun search(term: String): Single<List<Song>>
 
-    val popularSongs: List<Song>
-
     fun populateSong(id: String): Single<PlayableSong>
+
+    val popularSongs: List<Song>
+    var songQueue: List<Song>
+    var positionInQueue : Int
+    var context : Context?
 }
