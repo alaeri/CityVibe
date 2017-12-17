@@ -22,6 +22,7 @@ class PlayerActivity: BaseActivity<IPlayerPresenter, IPlayerPresenter.View>(), I
 
     override val presenter: IPlayerPresenter = PlayerPresenter()
     private val viewPagerAdapter = SongPagerAdapter(this)
+    var lastStatus = IPlayerPresenter.Status.PAUSE
 
     override fun setContentBeforePresenterStarts() {
         Log.d("PlayerActivity", "POSTPONING ANIMATION")
@@ -69,16 +70,21 @@ class PlayerActivity: BaseActivity<IPlayerPresenter, IPlayerPresenter.View>(), I
     }
 
     override fun showSongAt(position: Int) {
-        viewPager.currentItem = position
+        viewPager.setCurrentItem(position, true)
     }
 
     override fun setStatus(status: IPlayerPresenter.Status) {
+        Log.d("PlayerActivity", "Status song: $status $lastStatus")
         when(status){
             IPlayerPresenter.Status.PLAYING -> {
-                playButton.changeMode(FloatingMusicActionButton.Mode.PAUSE_TO_PLAY)
-                bufferingTextView.visibility = View.INVISIBLE
+                if(status != lastStatus) {
+                    playButton.animation?.cancel()
+                    playButton.changeMode(FloatingMusicActionButton.Mode.PAUSE_TO_PLAY)
+                    bufferingTextView.visibility = View.INVISIBLE
+                }
             }
             IPlayerPresenter.Status.PAUSE-> {
+                playButton.animation?.cancel()
                 playButton.changeMode(FloatingMusicActionButton.Mode.PLAY_TO_PAUSE)
                 bufferingTextView.visibility = View.INVISIBLE
             }
@@ -95,5 +101,9 @@ class PlayerActivity: BaseActivity<IPlayerPresenter, IPlayerPresenter.View>(), I
                 bufferingTextView.visibility = View.VISIBLE
             }
         }
+        lastStatus = status
     }
+
+    override fun setSongProgress(progress: Int) { seekBar.progress = progress }
+
 }
