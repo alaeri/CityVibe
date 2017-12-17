@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Created by Emmanuel Requier on 17/12/2017.
- * This class hides the complexity of the Android Media Player
+ * This class hides the complexity of the Android Media Player by sending events to a flowable
  *
  */
 class CVMediaPlayerImpl(val context: Context,val dataManager: DataManager) : CVMediaPlayer {
@@ -47,6 +47,8 @@ class CVMediaPlayerImpl(val context: Context,val dataManager: DataManager) : CVM
         }
         mp.setOnErrorListener { _,_,_ -> eventsSubject.onNext(CVMediaPlayer.Event.Errored("playback error")); true }
         mp.setOnCompletionListener { eventsSubject.onNext(CVMediaPlayer.Event.Completed()) }
+
+        //We need to poll the mediaplayer for progress :L
         service.scheduleWithFixedDelay({ checkPlayingAndEmitProgress() }, 4, 4, TimeUnit.MILLISECONDS)
 
     }

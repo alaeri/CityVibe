@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import org.alaeri.cityvibe.cityvibe.CityVibeApp
 import org.alaeri.cityvibe.model.DataManager
-import org.alaeri.cityvibe.presenter.AppPresenter
-import org.alaeri.cityvibe.presenter.AppView
+import org.alaeri.cityvibe.presenter.IAppPresenter
+import org.alaeri.cityvibe.presenter.IAppView
 
 /**
  * Created by Emmanuel Requier on 17/12/2017.
+ * We want to do here all the low-level MVP stuff
  */
-abstract class BaseActivity<P: AppPresenter<P, V>, V: AppView<P,V>> :  AppCompatActivity(), AppView<P,V>{
+abstract class BaseActivity<P: IAppPresenter<P, V>, V: IAppView<P,V>> :  AppCompatActivity(), IAppView<P,V>{
 
     abstract val presenter : P
     abstract fun setContentBeforePresenterStarts()
@@ -18,7 +19,7 @@ abstract class BaseActivity<P: AppPresenter<P, V>, V: AppView<P,V>> :  AppCompat
     final override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentBeforePresenterStarts()
-        presenter.onStart(this as V)
+        presenter.onStart(this as V) //I tried to fix it but I'm not really strong with generics
     }
 
     override fun onResume() {
@@ -36,6 +37,7 @@ abstract class BaseActivity<P: AppPresenter<P, V>, V: AppView<P,V>> :  AppCompat
         presenter.onDestroy()
     }
 
+    //This is here because Dependency Injection is not done yet
     final override fun dataManager(): DataManager = (this.application as CityVibeApp).dataManager
 
 }

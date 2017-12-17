@@ -10,10 +10,10 @@ import java.util.concurrent.TimeUnit
 
 /**
  * Created by Emmanuel Requier on 17/12/2017.
- *
+ * Presenter for the player
  *
  */
-interface IPlayerPresenter : AppPresenter<IPlayerPresenter, IPlayerPresenter.View> {
+interface IPlayerPresenter : IAppPresenter<IPlayerPresenter, IPlayerPresenter.View> {
 
     fun swipeTo(position: Int)
     fun playPauseClicked()
@@ -28,9 +28,9 @@ interface IPlayerPresenter : AppPresenter<IPlayerPresenter, IPlayerPresenter.Vie
         ERROR
     }
 
-    interface View : AppView<IPlayerPresenter, View> {
+    interface View : IAppView<IPlayerPresenter, View> {
         fun setStatus(status: Status)
-        fun setSongs(Songs: List<Song>, selectedPosition: Int)
+        fun setSongs(songs: List<Song>, selectedPosition: Int)
         fun showSongAt(position: Int)
         fun setSongProgress(progress: Int)
     }
@@ -52,6 +52,7 @@ class PlayerPresenter : IPlayerPresenter, BaseAppPresenter<IPlayerPresenter, IPl
 
         view?.setSongs(songs, songPosition)
 
+        //Slow subscription to show messages and statuses without blinking
         val sub = mp.events.throttleLast(60, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread()).subscribe {
             val status = when (it) {
                 is CVMediaPlayer.Event.Errored -> IPlayerPresenter.Status.ERROR
@@ -65,6 +66,7 @@ class PlayerPresenter : IPlayerPresenter, BaseAppPresenter<IPlayerPresenter, IPl
         }
         compositeDispo.add(sub)
 
+        //Fast subscription for a smooth seekbar
         val seekSub = mp.events.filter{it is CVMediaPlayer.Event.Playing}.subscribe {
             view?.setSongProgress(((it as CVMediaPlayer.Event.Playing).progress * 1000).toInt())
         }

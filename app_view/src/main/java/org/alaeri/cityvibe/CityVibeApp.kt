@@ -6,6 +6,8 @@ import org.alaeri.cityvibe.model.DataManagerImpl
 
 /**
  * Created by Emmanuel Requier on 16/12/2017.
+ * CityVibeApp Singleton contains a reference to the DataManager
+ *
  */
 class CityVibeApp: Application() {
 

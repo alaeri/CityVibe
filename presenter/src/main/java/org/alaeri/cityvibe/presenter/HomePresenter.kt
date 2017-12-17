@@ -9,13 +9,13 @@ import org.alaeri.cityvibe.model.Song
  *
  */
 
-interface IHomePresenter : AppPresenter<IHomePresenter, IHomePresenter.View> {
+interface IHomePresenter : IAppPresenter<IHomePresenter, IHomePresenter.View> {
 
     fun query(term: String)
     fun onSwipeToRefresh()
     fun openSong(position: Int, animatedProperties: Any?)
 
-    interface View : AppView<IHomePresenter, View> {
+    interface View : IAppView<IHomePresenter, View> {
         fun replaceContentWith(songs: List<Song>)
         fun showAlert(alert: HomePresenter.Alert)
         fun stopRefreshing()

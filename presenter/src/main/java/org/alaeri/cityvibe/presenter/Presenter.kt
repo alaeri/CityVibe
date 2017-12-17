@@ -4,10 +4,15 @@ import org.alaeri.cityvibe.model.DataManager
 
 /**
  * Created by Emmanuel Requier on 17/12/2017.
+ *
+ * I reused some of the basic mvp framework we use at my work app for this
+ * We try to lock the presenter and the view to avoid unchecked casts,
+ * Too verbose // still an unchecked cast in BaseActivity.
+ *
+ * see BaseActivity.kt in module app_view that shows how to link the activity and the presenter
  */
 
-interface AppPresenter<P : AppPresenter<P, V>, V: AppView<P, V>> {
-
+interface IAppPresenter<P : IAppPresenter<P, V>, V: IAppView<P, V>> {
     fun onStart(v : V)
     fun onResume()
     fun onPause()
@@ -15,20 +20,18 @@ interface AppPresenter<P : AppPresenter<P, V>, V: AppView<P, V>> {
 
 }
 
-interface BaseAppView {
+interface IAppView<P : IAppPresenter<P, V>, V: IAppView<P, V>> {
     fun dataManager(): DataManager
 }
 
-interface AppView<P : AppPresenter<P, V>, V: AppView<P, V>> : BaseAppView
-
-abstract class BaseAppPresenter<P : AppPresenter<P, V>, V: AppView<P, V>> : AppPresenter<P, V> {
+abstract class BaseAppPresenter<P : IAppPresenter<P, V>, V: IAppView<P, V>> : IAppPresenter<P, V> {
 
     private var _view : V? = null
     protected val view: V?
         get() = _view
 
     private var _active : Boolean = false
-    protected val active : Boolean
+    protected val active : Boolean // should be true when activity isResumed
         get() = _active
 
     private lateinit var _dataManager : DataManager
@@ -57,6 +60,11 @@ abstract class BaseAppPresenter<P : AppPresenter<P, V>, V: AppView<P, V>> : AppP
     }
 
 
+    /**
+     * Let's mandate the use of these functions
+     * so no one can forget about lifecycle and cleaning Rx stuff
+     * view is set to null before start and after destroy too so we can't make mistakes
+     */
     protected abstract fun start()
     protected abstract fun resume()
     protected abstract fun pause()

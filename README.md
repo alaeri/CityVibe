@@ -33,7 +33,8 @@ A few rules:
 * [x] Nicer ui
 * [x] Pagination songs
 * [x] Drag to dismiss
-* [ ] Basic MVP arch
+* [x] Basic MVP arch
+* [x] Seekbar
 * [ ] MediaService
 * [ ] Currently playing notification
 
