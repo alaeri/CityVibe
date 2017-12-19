@@ -12,6 +12,7 @@
         <android.support.design.widget.CollapsingToolbarLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
             <android.support.v7.widget.Toolbar
@@ -22,13 +23,42 @@
                 android:elevation="4dp"
                 android:padding="@dimen/margin"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+                app:layout_collapseMode="pin">
                 <android.support.v7.widget.SearchView
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@drawable/searchview_bg"
-                    android:id="@+id/searchView"/>
+                    android:id="@+id/searchView"
+                    />
             </android.support.v7.widget.Toolbar>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginTop="60dp"
+                android:background="@color/colorPrimary"
+                android:paddingStart="15dp"
+                android:paddingEnd="15dp"
+                android:elevation="4dp"
+                app:layout_collapseMode="parallax"
+                app:layout_collapseParallaxMultiplier="2">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start|center_vertical"
+                    android:gravity="start|center_vertical"
+                    android:textSize="14sp"
+                    android:textColor="#FFFFFF"
+                    android:id="@+id/subtitleTextView"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="end|center_vertical"
+                    android:gravity="end|center_vertical"
+                    android:textSize="12sp"
+                    android:textColor="#FFFFFF"
+                    android:id="@+id/lastRefreshDateTextView"/>
+            </FrameLayout>
 
         </android.support.design.widget.CollapsingToolbarLayout>
 
@@ -41,21 +71,41 @@
         -->
     </android.support.design.widget.AppBarLayout>
 
+
     <android.support.v4.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swiperefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/songListView"
-            android:scrollbars="vertical"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingTop="@dimen/margin"
-            android:paddingRight="@dimen/margin"
-            android:paddingLeft="@dimen/margin"
-            android:clipToPadding="false" />
+            android:layout_height="match_parent">
+            <ProgressBar
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:id="@+id/largeLoader"
+                android:foregroundTint="@color/colorPrimary"
+                android:indeterminate="true"
+                android:layout_gravity="center"/>
+            <android.support.v7.widget.AppCompatImageButton
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_action_refresh"
+                android:background="@null"
+                android:id="@+id/largeRefreshButton"
+                android:layout_gravity="center"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/songListView"
+                android:scrollbars="vertical"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="@dimen/margin"
+                android:paddingRight="@dimen/margin"
+                android:paddingLeft="@dimen/margin"
+                android:clipToPadding="false"
+                android:visibility="invisible"/>
+        </FrameLayout>
     </android.support.v4.widget.SwipeRefreshLayout>
 </android.support.design.widget.CoordinatorLayout>
 

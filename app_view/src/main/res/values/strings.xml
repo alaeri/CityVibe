@@ -6,4 +6,6 @@
     <string name="previous">previous song</string>
     <string name="next">next song</string>
     <string name="loading">loading</string>
+    <string name="top"><b>TOP</b></string>
+    <string name="search_subtitle"><![CDATA[SEARCH: <b>%s</b>]]></string>
 </resources>

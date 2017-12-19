@@ -10,6 +10,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.http.GET
 import retrofit2.http.Query
+import java.util.*
 import kotlin.collections.ArrayList
 
 /**
@@ -18,12 +19,14 @@ import kotlin.collections.ArrayList
  *
  */
 class DataManagerImpl(override var context: Context?): DataManager {
+    override val top: Top
+        get() = _top
+
+    private var _top : Top = Top.NoResults("cache empty", Provider.CACHE)
 
     private val itunesAPI: ItunesAPI
     private val chartsAPI: ChartAPI
 
-    //These fields should not be here but moved to an object representing app state ...
-    override val popularSongs = ArrayList<Song>()
     override var songQueue: List<Song> = ArrayList()
     override var positionInQueue: Int = 0
 
@@ -44,7 +47,7 @@ class DataManagerImpl(override var context: Context?): DataManager {
 
     }
 
-    override fun refreshPopular(): Single<RefreshResults> =
+    override fun refreshPopular(): Single<Top> =
         chartsAPI.topChartsUs()
                 .map {
                     Log.d("DataManagerImpl","$it")
@@ -52,16 +55,16 @@ class DataManagerImpl(override var context: Context?): DataManager {
                         Song(it.name, it.artistName, it.artworkUrl100, it.id)
                     } // We map to a format we can use
                 }
-                .map {
-                    when {
-                        it.isEqual(popularSongs) -> RefreshResults.NoChange(it)
-                        else -> RefreshResults.NewResults(it)
-                    }
-                }
-                .doOnSuccess { it -> popularSongs.clear(); popularSongs.addAll(it.songs) }
+
+                .doOnSuccess { }
+                .map { Top.Results(it, Date(), Provider.NETWORK) as Top }
+                .doOnSuccess { _top = it  }
                 .onErrorReturn {
-                    Log.e("DataManagerImpl","Exception: $it")
-                    return@onErrorReturn  RefreshResults.NoConnection(songs = popularSongs)
+                    val immutableTop = _top
+                    when(immutableTop) {
+                        is Top.NoResults -> Top.NoResults("no network and no cached content", Provider.CACHE)
+                        is Top.Results -> Top.Results(immutableTop.songs, immutableTop.refreshDate, Provider.CACHE)
+                    }
                 }
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -91,13 +94,6 @@ class DataManagerImpl(override var context: Context?): DataManager {
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
 
-}
-
-private fun <T> List<T>.isEqual(o: List<T>): Boolean  {
-    val temp = ArrayList(this)
-    temp.retainAll(o)
-    Log.d("DataManagerImpl","size: ${temp.size} / ${this.size}")
-    return temp.size == this.size
 }
 
 interface ItunesAPI {
